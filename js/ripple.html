@@ -50,7 +50,7 @@
   }
 
   .rippleEffect {
-    animation: rippleEffect 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    animation: rippleEffect 2s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   @keyframes rippleEffect {
@@ -65,29 +65,47 @@
 <body>
   <button class="btn btn-info ripple-effect">点击波纹</button>
   <script>
+  function addEvent(dom, type, handler, capture) {
+  	if (document.addEventListener) {
+  		dom.addEventListener(type, handler, capture)
+  	} else {
+  		dom.attachEvent('on' + type, handler)
+  	} 
+  }
+
+  function animationEnd(dom, handler) {
+  	dom.addEventListener('animationend', handler, false);
+  	dom.addEventListener('webkitAnimationEnd', handler, false);
+  	dom.addEventListener('OAnimationEnd', handler, false);
+  	dom.addEventListener('mozAnimationEnd', handler, false);
+  }
+
   var btn = document.querySelectorAll('.ripple-effect');
   btn[0].addEventListener('click', function(e) {
     var that = this;
     var scrollLeft = document.body.scrollLeft || document.documentElement.scrollLeft,
-      scrollRight = document.body.scrollTop || document.documentElement.scrollTop,
-      mouseX = e.pageX + scrollLeft,
-      mouseY = e.pageY + scrollRight,
+      scrollTop = document.body.scrollTop || document.documentElement.scrollTop,
+      mouseX = e.pageX || scrollLeft + e.clientX,
+      mouseY = e.pageY || scrollTop + e.clientY,
       btnX = that.offsetLeft,
       btnY = that.offsetTop,
-      x = mouseX - btnX,
-      y = mouseY - btnY,
-      w = that.offsetWidth;
+      w = that.offsetWidth,
+      x = mouseX - btnX - w / 2,
+      y = mouseY - btnY - w / 2;
 
     var span = document.createElement('span');
     span.className = 'ripple';
     span.style.cssText = "width:" + w + "px; height:" + w + "px; left:" + x + "px; top:" + y + "px;";
-    console.log(w, x, y);
+
     that.appendChild(span);
-    span.addEventListener('animationEnd', function(e) {
+
+    // 注意不是驼峰。。。animationEnd是错的
+    span.addEventListener('animationend', function(e) {
       this.parentNode.removeChild(this);
     });
 
     span.classList.add('rippleEffect');
+    // span.className += ' rippleEffect';
   });
   </script>
 </body>
